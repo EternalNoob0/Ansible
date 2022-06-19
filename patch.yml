@@ -1,5 +1,33 @@
 ---
-- name: Upgrade all packages
-  yum:
-    name: '*'
-    state: update_only
+- hosts: all
+  vars:
+    yum_name: "*"
+    yum_state: "latest"
+    dnf_name: "*"
+    dnf_state: "latest"
+  become: true
+  tasks:
+  - name: System Update via yum
+    yum:
+      name={{ yum_name }}
+      state={{ yum_state }}
+    register: yum_output
+    when:
+      - (ansible_facts['distribution_major_version'] == '6') or
+        (ansible_facts['distribution_major_version'] == '7')
+  - name: Print errors when yum failed
+    debug:
+      msg: "yum command output"
+    when: yum_output is not defined
+
+  - name: System Update via dnf
+    dnf:
+      name={{dnf_name}}
+      state={{dnf_state}}
+    register: dnf_output
+    when:
+      - (ansible_facts['distribution_major_version'] == '8')
+  - name: Print error when dnf failed
+    debug:
+      msg: "dnf command output"
+    when: dnf_output is not defined
