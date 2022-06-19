@@ -1,0 +1,16 @@
+---
+- hosts: all
+  become: true
+  tasks:
+  - name: Shutdown server
+    command: shutdown -h now
+    tags: shutdown
+  - name: Rebooting server
+    command: reboot
+    tags: reboot
+  - name: Uptime of Server
+    command: uptime
+    register: svruptime
+    tags: uptime
+  - debug: msg="Server uptime is {{ svruptime.stdout_lines }}"
+    tags: uptime

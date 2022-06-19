@@ -1,0 +1,24 @@
+---
+  - hosts: all
+    vars:
+      dest_file: /tmp/access.conf
+    tasks:
+    - name: Creating file
+      file:
+        path: "{{dest_file}}"
+        state: touch
+        mode: 0644
+    - name: Adding ACL content
+      lineinfile:
+        dest: "{{dest_file}}"
+        line: "{{item}}"
+
+      with_items:
+        - "+ : @lx_all_login : ALL"
+        - "+ : ALL : cron crond"
+        - "+ : root : LOCAL 10. .gartner.com"
+        - "+ : ssadmin : LOCAL 10. .gartner.com"
+        - "+ : @svcacct<%= @env %> : ALL"
+        - "+ : @{{ansible_fqdn}} : ALL"
+        - "- : ALL : ALL"
+
