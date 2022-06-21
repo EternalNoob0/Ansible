@@ -1,0 +1,14 @@
+---
+- hosts : lab
+  gather_facts: yes
+  become: yes
+  become_user: root
+
+  tasks:
+     - name: Update hosts file with primary ipaddress
+       lineinfile:
+          path: "/etc/hosts"
+          #line: "{{ansible_default_ipv4.address}}   {{ansible_hostname}}    {{ansible_fqdn}} "
+          line: "{{ansible_default_ipv4.address}}   {{ansible_hostname}}    {{ansible_nodename}} "
+          state: present
+       tags: hosts_file
