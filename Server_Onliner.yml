@@ -5,12 +5,23 @@
   - name: Shutdown server
     command: shutdown -h now
     tags: shutdown
-  - name: Rebooting server
-    command: reboot
-    tags: reboot
+
+  - name: Reboot Server with facts/factless server
+    block:
+       - name: Reboot Server and wait for reconnect system
+         reboot:
+            reboot_timeout: 100
+         when: (ansible_virtualization_role == "NA") or (ansible_virtualization_role == "guest")
+    rescue:
+       - name: Reboot Server for factless systems
+         reboot:
+            reboot_timeout: 200
+    tags: [uptime,reboot_uptime] 
+  
   - name: Uptime of Server
     command: uptime
     register: svruptime
-    tags: uptime
+    tags: [uptime, reboot_uptime]
+  
   - debug: msg="Server uptime is {{ svruptime.stdout_lines }}"
-    tags: uptime
+    tags: [uptime,reboot_uptime]
