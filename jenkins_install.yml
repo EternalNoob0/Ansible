@@ -1,0 +1,41 @@
+---
+- hosts: all
+  become: true
+  remote_user: ansible
+#REFERENCE URL : t.ly/vfuX
+  tasks:
+  - name: Download Jenkins Long Term Support Release
+    ansible.builtin.get_url:
+      url: https://pkg.jenkins.io/redhat-stable/jenkins.repo
+      dest: /etc/yum.repos.d/jenkins.repo
+
+  - name: Importing Jenkins KEY from url
+    ansible.builtin.rpm_key:
+      state: present
+      key: https://pkg.jenkins.io/redhat-stable/jenkins.io.key
+
+  - name : Updating Packages
+    ansible.builtin.yum:
+      name:
+        - "*"
+      state: latest
+
+  - name: Installing OPENJDK/JAVA
+    ansible.builtin.yum:
+      name:
+        - java-11-openjdk
+      state: present
+  
+  - name: Installing Jenkins
+    ansible.builtin.yum:
+      name:
+        - jenkins
+
+  - name: Systemctl Daemon Reload
+    ansible.builtin.systemd:
+      daemon_reload: yes
+
+  - name: Jenkins Service Start
+    ansible.builtin.systemd:
+      name: jenkins
+      state: started
