@@ -1,0 +1,11 @@
+---
+- hosts: all
+  tasks:
+  - name: Gather inventory information
+    setup:
+      filter: ansible_*
+    register: inventory_output
+  - name: Save inventory information to file
+    copy:
+      content: "{{ inventory_output.ansible_facts | to_nice_json }}"
+      dest: inventory.txt
